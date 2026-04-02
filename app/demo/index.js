@@ -5,6 +5,32 @@ const childProcess = require("child_process");
 const readline = require("readline");
 const assert = require("assert");
 
+const certPath = path.resolve(__dirname, "certificate.pem");
+const privPath = path.resolve(__dirname, "private-key.pem");
+const publicPath = path.resolve(__dirname, "public-key.pem");
+const testPath = path.resolve(__dirname, "data.txt");
+const signedPath = path.resolve(__dirname, "signed.bin");
+
+function cleanUp() {
+	try {
+		fs.unlinkSync(testPath);
+		fs.unlinkSync(signedPath);
+		fs.unlinkSync(certPath);
+		fs.unlinkSync(privPath);
+		fs.unlinkSync(publicPath);
+	} catch (err) {
+		if (err.code !== "ENOENT") {
+			throw err;
+		}
+	}
+	console.log("Test files cleaned up!");
+}
+
+console.log("Cleaning up test files...");
+cleanUp();
+
+console.log("Generating certificate and keys...");
+
 const keys = forge.pki.rsa.generateKeyPair(2048);
 
 const cert = forge.pki.createCertificate();
@@ -45,10 +71,6 @@ const certPem = forge.pki.certificateToPem(cert);
 const privateKeyPem = forge.pki.privateKeyToPem(keys.privateKey);
 const publicKeyPem = forge.pki.publicKeyToPem(keys.publicKey);
 
-const certPath = path.resolve(__dirname, "certificate.pem");
-const privPath = path.resolve(__dirname, "private-key.pem");
-const publicPath = path.resolve(__dirname, "public-key.pem");
-
 fs.writeFileSync(certPath, certPem);
 fs.writeFileSync(privPath, privateKeyPem);
 fs.writeFileSync(publicPath, publicKeyPem);
@@ -56,11 +78,15 @@ fs.writeFileSync(publicPath, publicKeyPem);
 console.log("Certificate and keys saved!");
 
 console.log("Test 1: Verifying certificate with OpenSSL...");
-childProcess.execSync(`openssl x509 -in "${certPath}" -text -noout`, { stdio: "inherit" });
+assert.doesNotThrow(() => {
+	childProcess.execSync(`openssl x509 -in "${certPath}" -text -noout`, { stdio: "inherit" });
+}, "Certificate verification failed!");
 console.log("\n");
 
 console.log("Test 2: Verifying private key with OpenSSL...");
-childProcess.execSync(`openssl rsa -in "${privPath}" -text -noout`, { stdio: "inherit" });
+assert.doesNotThrow(() => {
+	childProcess.execSync(`openssl rsa -in "${privPath}" -text -noout`, { stdio: "inherit" });
+}, "Private key verification failed!");
 console.log("\n");
 
 console.log("Test 3: Comparing modulus...");
@@ -76,8 +102,6 @@ console.log("\n");
 console.log("Test 4: Verifying certificate with private key with OpenSSL...");
 
 console.log("4.1. Preparing test data:");
-const testPath = path.resolve(__dirname, "data.txt");
-const signedPath = path.resolve(__dirname, "signed.bin");
 
 fs.writeFileSync(testPath, "Hello OpenSSL!");
 childProcess.execSync(`openssl pkeyutl -inkey "${privPath}" -sign -in "${testPath}" -out "${signedPath}"`, {
@@ -94,15 +118,6 @@ childProcess.execSync(`openssl pkeyutl -verify -pubin -inkey "${publicPath}" -si
 console.log("\n");
 
 // Clean up test data
-function cleanUp(answer) {
-	fs.unlinkSync(testPath);
-	fs.unlinkSync(signedPath);
-	fs.unlinkSync(certPath);
-	fs.unlinkSync(privPath);
-	fs.unlinkSync(publicPath);
-	console.log("Test files cleaned up!");
-}
-
 const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout,
@@ -110,7 +125,7 @@ const rl = readline.createInterface({
 rl.question("Do you want to clean up test files? (y/N) ", (answer) => {
 	rl.close();
 	if (answer.toLowerCase() === "y") {
-		cleanUp(answer);
+		cleanUp();
 		return;
 	}
 });
