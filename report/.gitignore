@@ -1,0 +1,47 @@
+# LaTeX temporary files
+*.aux
+*.bbl
+*.blg
+*.brf
+*.fdb_latexmk
+*.fls
+*.fmt
+*.fot
+*.out
+*.synctex
+*.synctex(busy)
+*.synctex.gz
+
+# Build artifacts
+*.dvi
+*.log
+*.pdf
+*.xdv
+
+# Intermediate files
+*.lof
+*.lot
+*.toc
+*.tof
+
+# Bibliography
+*.bcf
+*.run.xml
+
+# Misc
+*.gnuplot
+*.table
+*.makefile
+.DS_Store
+*~
+*.swp
+*.swo
+*.backup
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Latexmk
+latexmkrc
