@@ -28,7 +28,7 @@ jobs:
 
             - name: Set outputs
               id: vars
-              run: echo "timestamp=$(date -u +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+              run: echo "timestamp=$(date -u +'%Y.%m.%d-%H.%M.%S')" >> $GITHUB_OUTPUT
 
             - name: Release PDF
               uses: softprops/action-gh-release@v2
@@ -36,4 +36,4 @@ jobs:
                   files: |
                       ./Report.pdf
                   tag_name: ${{ steps.vars.outputs.timestamp }}
-                  name: Report PDF - ${{ steps.vars.outputs.timestamp }}
+                  name: Seminar - ${{ steps.vars.outputs.timestamp }}
