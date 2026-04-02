@@ -1,0 +1,39 @@
+name: Build LaTeX
+
+on:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+jobs:
+    build_latex:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - name: Set up Git repository
+              uses: actions/checkout@v5
+
+            - name: Compile LaTeX document
+              uses: xu-cheng/latex-action@v3
+              with:
+                  root_file: main.tex
+                  latexmk_shell_escape: true
+                  working_directory: ./report
+
+            - name: Move PDF to root
+              run: mv ./report/main.pdf ./Report.pdf
+
+            - name: Set outputs
+              id: vars
+              run: echo "timestamp=$(date -u +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
+            - name: Release PDF
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: |
+                      ./Report.pdf
+                  tag_name: ${{ steps.vars.outputs.timestamp }}
+                  name: Report PDF - ${{ steps.vars.outputs.timestamp }}
