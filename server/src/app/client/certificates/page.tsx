@@ -32,7 +32,7 @@ export default function CertificatesPage() {
       </div>
 
       {/* Requests */}
-      <div className="card bg-base-100 border border-base-300 shadow-sm">
+      <div className="card bg-base-100 border border-base-content/10 shadow-md">
         <div className="card-body">
           <h3 className="card-title text-lg">Yêu cầu CSR ({requests.length})</h3>
           <div className="overflow-x-auto">
@@ -55,7 +55,7 @@ export default function CertificatesPage() {
       </div>
 
       {/* Certificates */}
-      <div className="card bg-base-100 border border-base-300 shadow-sm">
+      <div className="card bg-base-100 border border-base-content/10 shadow-md">
         <div className="card-body">
           <h3 className="card-title text-lg">Chứng chỉ đã cấp ({certs.length})</h3>
           <div className="overflow-x-auto">

@@ -41,7 +41,7 @@ export default function CRLPage() {
       {message.text && <div className={`alert ${message.type === "success" ? "alert-success" : "alert-error"} animate-fade-in`}>{message.text}</div>}
 
       {crl ? (
-        <div className="card bg-base-100 border border-base-300 shadow-sm">
+        <div className="card bg-base-100 border border-base-content/10 shadow-md">
           <div className="card-body">
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div><p className="text-xs text-base-content/50 uppercase">Ngày phát hành</p><p className="font-medium">{new Date(crl.issuedAt).toLocaleString("vi-VN")}</p></div>
@@ -55,7 +55,7 @@ export default function CRLPage() {
           </div>
         </div>
       ) : (
-        <div className="card bg-base-100 border border-base-300"><div className="card-body text-center py-12"><p className="text-base-content/50">Chưa có CRL nào. Nhấn &quot;Cập nhật CRL&quot; để tạo.</p></div></div>
+        <div className="card bg-base-100 border border-base-content/10"><div className="card-body text-center py-12"><p className="text-base-content/50">Chưa có CRL nào. Nhấn &quot;Cập nhật CRL&quot; để tạo.</p></div></div>
       )}
     </div>
   );

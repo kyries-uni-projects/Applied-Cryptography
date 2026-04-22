@@ -26,7 +26,7 @@ export default async function AdminDashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="stat bg-base-100 rounded-xl border border-base-300 shadow-sm card-hover">
+        <div className="stat bg-base-100 rounded-xl border border-base-content/10 shadow-md card-hover">
           <div className="stat-figure text-primary">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
           </div>
@@ -35,7 +35,7 @@ export default async function AdminDashboard() {
           <div className="stat-desc">Tổng số client đăng ký</div>
         </div>
 
-        <div className="stat bg-base-100 rounded-xl border border-base-300 shadow-sm card-hover">
+        <div className="stat bg-base-100 rounded-xl border border-base-content/10 shadow-md card-hover">
           <div className="stat-figure text-success">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
@@ -44,7 +44,7 @@ export default async function AdminDashboard() {
           <div className="stat-desc">Tổng: {totalCerts} | Thu hồi: {revokedCerts}</div>
         </div>
 
-        <div className="stat bg-base-100 rounded-xl border border-base-300 shadow-sm card-hover">
+        <div className="stat bg-base-100 rounded-xl border border-base-content/10 shadow-md card-hover">
           <div className="stat-figure text-warning">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
@@ -53,7 +53,7 @@ export default async function AdminDashboard() {
           <div className="stat-desc">Yêu cầu cấp chứng chỉ</div>
         </div>
 
-        <div className="stat bg-base-100 rounded-xl border border-base-300 shadow-sm card-hover">
+        <div className="stat bg-base-100 rounded-xl border border-base-content/10 shadow-md card-hover">
           <div className="stat-figure text-error">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
           </div>
@@ -65,7 +65,7 @@ export default async function AdminDashboard() {
 
       {/* CA Config Summary */}
       {caConfig && (
-        <div className="card bg-base-100 border border-base-300 shadow-sm">
+        <div className="card bg-base-100 border border-base-content/10 shadow-md">
           <div className="card-body">
             <h3 className="card-title text-lg">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -100,7 +100,7 @@ export default async function AdminDashboard() {
       )}
 
       {/* Recent Activity */}
-      <div className="card bg-base-100 border border-base-300 shadow-sm">
+      <div className="card bg-base-100 border border-base-content/10 shadow-md">
         <div className="card-body">
           <h3 className="card-title text-lg">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>

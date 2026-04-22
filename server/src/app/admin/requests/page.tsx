@@ -68,7 +68,7 @@ export default function RequestsPage() {
         <button onClick={fetchRequests} className="btn btn-ghost btn-sm">Làm mới</button>
       </div>
 
-      <div className="card bg-base-100 border border-base-300 shadow-sm overflow-hidden">
+      <div className="card bg-base-100 border border-base-content/10 shadow-md overflow-hidden">
         <div className="overflow-x-auto">
           <table className="table">
             <thead><tr><th>User</th><th>Domain</th><th>Key</th><th>Trạng thái</th><th>Ngày</th><th>Hành động</th></tr></thead>

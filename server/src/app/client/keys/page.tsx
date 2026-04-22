@@ -43,7 +43,7 @@ export default function KeysPage() {
       </div>
 
       {/* Generate Form */}
-      <div className="card bg-base-100 border border-base-300 shadow-sm">
+      <div className="card bg-base-100 border border-base-content/10 shadow-md">
         <div className="card-body">
           <h3 className="card-title text-lg">Tạo cặp khóa mới</h3>
           <form onSubmit={handleGenerate} className="flex flex-wrap gap-4 items-end">
@@ -67,7 +67,7 @@ export default function KeysPage() {
       </div>
 
       {/* Keys List */}
-      <div className="card bg-base-100 border border-base-300 shadow-sm overflow-hidden">
+      <div className="card bg-base-100 border border-base-content/10 shadow-md overflow-hidden">
         <div className="overflow-x-auto">
           <table className="table">
             <thead><tr><th>Nhãn</th><th>Độ dài</th><th>Ngày tạo</th><th>Hành động</th></tr></thead>

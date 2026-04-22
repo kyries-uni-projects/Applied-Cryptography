@@ -59,7 +59,7 @@ export default function UploadPage() {
 
       {message.text && <div className={`alert ${message.type === "success" ? "alert-success" : "alert-error"} animate-fade-in`}>{message.text}</div>}
 
-      <div className="card bg-base-100 border border-base-300 shadow-sm">
+      <div className="card bg-base-100 border border-base-content/10 shadow-md">
         <div className="card-body">
           <h3 className="card-title">Upload Certificate PEM</h3>
           <form onSubmit={handleUpload} className="space-y-4">
@@ -84,7 +84,7 @@ export default function UploadPage() {
       </div>
 
       {/* Uploaded certs list */}
-      <div className="card bg-base-100 border border-base-300 shadow-sm overflow-hidden">
+      <div className="card bg-base-100 border border-base-content/10 shadow-md overflow-hidden">
         <div className="card-body">
           <h3 className="card-title">Chứng chỉ đã upload ({certs.length})</h3>
         </div>

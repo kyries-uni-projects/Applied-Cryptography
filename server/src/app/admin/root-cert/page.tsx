@@ -84,7 +84,7 @@ export default function RootCertPage() {
       )}
 
       {!exists ? (
-        <div className="card bg-base-100 border border-base-300 shadow-sm">
+        <div className="card bg-base-100 border border-base-content/10 shadow-md">
           <div className="card-body">
             <h3 className="card-title">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
@@ -126,7 +126,7 @@ export default function RootCertPage() {
       ) : (
         <>
           {/* Certificate Info */}
-          <div className="card bg-base-100 border border-base-300 shadow-sm">
+          <div className="card bg-base-100 border border-base-content/10 shadow-md">
             <div className="card-body">
               <h3 className="card-title text-success gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>

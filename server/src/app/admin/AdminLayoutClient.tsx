@@ -63,7 +63,7 @@ export default function AdminLayoutClient({
         username={username}
       />
       <main className="flex-1 bg-base-200">
-        <div className="navbar bg-base-100 border-b border-base-300 px-6 shadow-sm">
+        <div className="navbar bg-base-100 border-b border-base-content/10 px-6 shadow-sm">
           <div className="flex-1">
             <h1 className="text-lg font-semibold">Quản trị Certificate Authority</h1>
           </div>

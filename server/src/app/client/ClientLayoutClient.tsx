@@ -25,7 +25,7 @@ export default function ClientLayoutClient({ children, username }: { children: R
     <div className="flex min-h-screen">
       <Sidebar links={clientLinks} title="CA Client" subtitle="Quản lý chứng chỉ" username={username} />
       <main className="flex-1 bg-base-200">
-        <div className="navbar bg-base-100 border-b border-base-300 px-6 shadow-sm">
+        <div className="navbar bg-base-100 border-b border-base-content/10 px-6 shadow-sm">
           <div className="flex-1"><h1 className="text-lg font-semibold">Certificate Management</h1></div>
           <div className="flex-none gap-2 flex items-center">
             <ThemeToggle />

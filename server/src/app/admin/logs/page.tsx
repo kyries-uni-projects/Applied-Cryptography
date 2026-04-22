@@ -28,7 +28,7 @@ export default function LogsPage() {
         <p className="text-base-content/60 mt-1">Theo dõi các hoạt động chính của hệ thống ({total} mục)</p>
       </div>
 
-      <div className="card bg-base-100 border border-base-300 shadow-sm overflow-hidden">
+      <div className="card bg-base-100 border border-base-content/10 shadow-md overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-12"><span className="loading loading-spinner loading-lg text-primary"></span></div>
         ) : (

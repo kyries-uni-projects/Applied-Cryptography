@@ -26,9 +26,9 @@ export default function Sidebar({ links, title, subtitle, username }: SidebarPro
   };
 
   return (
-    <aside className="w-64 min-h-screen bg-base-100 border-r border-base-300 flex flex-col shadow-lg">
+    <aside className="w-64 min-h-screen bg-base-100 border-r border-base-content/10 flex flex-col shadow-lg">
       {/* Header */}
-      <div className="p-5 border-b border-base-300">
+      <div className="p-5 border-b border-base-content/10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-md">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -63,7 +63,7 @@ export default function Sidebar({ links, title, subtitle, username }: SidebarPro
       </nav>
 
       {/* User & Logout */}
-      <div className="p-4 border-t border-base-300">
+      <div className="p-4 border-t border-base-content/10">
         {username && (
           <div className="flex items-center gap-2 mb-3 px-2">
             <div className="avatar placeholder">

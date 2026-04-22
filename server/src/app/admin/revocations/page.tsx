@@ -47,7 +47,7 @@ export default function RevocationsPage() {
         <p className="text-base-content/60 mt-1">Phê duyệt hoặc từ chối yêu cầu thu hồi từ người dùng</p>
       </div>
 
-      <div className="card bg-base-100 border border-base-300 shadow-sm overflow-hidden">
+      <div className="card bg-base-100 border border-base-content/10 shadow-md overflow-hidden">
         <div className="overflow-x-auto">
           <table className="table">
             <thead><tr><th>User</th><th>Serial (cert)</th><th>Subject</th><th>Lý do</th><th>Trạng thái</th><th>Ngày</th><th>Hành động</th></tr></thead>

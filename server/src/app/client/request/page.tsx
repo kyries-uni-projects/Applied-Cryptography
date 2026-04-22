@@ -49,7 +49,7 @@ export default function RequestPage() {
       {keys.length === 0 ? (
         <div className="alert alert-warning">Bạn chưa có cặp khóa nào. Vui lòng tạo cặp khóa trước tại mục &quot;Cặp khóa&quot;.</div>
       ) : (
-        <div className="card bg-base-100 border border-base-300 shadow-sm">
+        <div className="card bg-base-100 border border-base-content/10 shadow-md">
           <div className="card-body">
             <h3 className="card-title">Thông tin CSR</h3>
             <form onSubmit={handleSubmit} className="space-y-4">

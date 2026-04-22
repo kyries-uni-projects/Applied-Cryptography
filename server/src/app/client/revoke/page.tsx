@@ -51,7 +51,7 @@ export default function RevokePage() {
       {certs.length === 0 ? (
         <div className="alert alert-info">Bạn không có chứng chỉ active nào để thu hồi.</div>
       ) : (
-        <div className="card bg-base-100 border border-base-300 shadow-sm">
+        <div className="card bg-base-100 border border-base-content/10 shadow-md">
           <div className="card-body">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="form-control">

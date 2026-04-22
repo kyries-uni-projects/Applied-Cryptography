@@ -24,7 +24,7 @@ export default function ClientCRLPage() {
         <p className="text-base-content/60 mt-1">Danh sách chứng chỉ đã thu hồi của toàn hệ thống</p>
       </div>
 
-      <div className="card bg-base-100 border border-base-300 shadow-sm">
+      <div className="card bg-base-100 border border-base-content/10 shadow-md">
         <div className="card-body">
           <h3 className="card-title">Chứng chỉ đã thu hồi ({revokedCerts.length})</h3>
           <div className="overflow-x-auto">
@@ -46,7 +46,7 @@ export default function ClientCRLPage() {
       </div>
 
       {crlPem && (
-        <div className="card bg-base-100 border border-base-300 shadow-sm">
+        <div className="card bg-base-100 border border-base-content/10 shadow-md">
           <div className="card-body">
             <h3 className="card-title">CRL PEM</h3>
             <div className="mockup-code text-xs max-h-48 overflow-auto"><pre><code>{crlPem}</code></pre></div>
