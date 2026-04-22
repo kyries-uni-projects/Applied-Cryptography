@@ -2,6 +2,7 @@
 
 import Sidebar from "@/components/Sidebar";
 import ChangePasswordModal from "@/components/ChangePasswordModal";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const adminLinks = [
   {
@@ -66,7 +67,8 @@ export default function AdminLayoutClient({
           <div className="flex-1">
             <h1 className="text-lg font-semibold">Quản trị Certificate Authority</h1>
           </div>
-          <div className="flex-none gap-2">
+          <div className="flex-none gap-2 flex items-center">
+            <ThemeToggle />
             <ChangePasswordModal />
           </div>
         </div>

@@ -23,28 +23,49 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: oklch(var(--bc) / 0.2);
+  @apply bg-base-content/20;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(var(--bc) / 0.4);
+  @apply bg-base-content/40;
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 5px oklch(var(--p) / 0.3); }
-  50% { box-shadow: 0 0 20px oklch(var(--p) / 0.6); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 5px color-mix(in oklch, var(--color-primary) 30%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 20px color-mix(in oklch, var(--color-primary) 60%, transparent);
+  }
 }
 
 .animate-fade-in {
@@ -66,12 +87,12 @@ body {
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px oklch(var(--p) / 0.15);
+  @apply shadow-xl shadow-primary/15;
 }
 
 /* Gradient backgrounds */
 .bg-gradient-primary {
-  background: linear-gradient(135deg, oklch(var(--p)) 0%, oklch(var(--s)) 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
 }
 
 /* Status badges */
@@ -83,9 +104,17 @@ body {
   margin-right: 6px;
 }
 
-.status-active { background-color: oklch(var(--su)); }
-.status-pending { background-color: oklch(var(--wa)); }
-.status-revoked { background-color: oklch(var(--er)); }
+.status-active {
+  @apply bg-success;
+}
+
+.status-pending {
+  @apply bg-warning;
+}
+
+.status-revoked {
+  @apply bg-error;
+}
 
 /* Table styles */
 .table th {
@@ -102,13 +131,9 @@ body {
 }
 
 .sidebar-link:hover {
-  background: oklch(var(--p) / 0.1);
-  border-left-color: oklch(var(--p) / 0.5);
+  @apply bg-primary/10 border-l-primary/50;
 }
 
 .sidebar-link.active {
-  background: oklch(var(--p) / 0.15);
-  border-left-color: oklch(var(--p));
-  color: oklch(var(--p));
-  font-weight: 600;
+  @apply bg-primary/15 border-l-primary text-primary font-semibold;
 }

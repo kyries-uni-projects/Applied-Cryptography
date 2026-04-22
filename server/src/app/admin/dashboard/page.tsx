@@ -90,7 +90,7 @@ export default async function AdminDashboard() {
               </div>
             </div>
             <div className="mt-2">
-              <span className={`badge ${caConfig.rootCertPem ? "badge-success" : "badge-warning"} gap-1`}>
+              <span className={`badge badge-soft ${caConfig.rootCertPem ? "badge-success" : "badge-warning"} gap-1`}>
                 <span className={`status-dot ${caConfig.rootCertPem ? "status-active" : "status-pending"}`}></span>
                 {caConfig.rootCertPem ? "Root Certificate đã tạo" : "Chưa tạo Root Certificate"}
               </span>
