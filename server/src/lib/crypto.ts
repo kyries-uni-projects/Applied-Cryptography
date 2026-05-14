@@ -90,6 +90,9 @@ export function generateCSR(options: CSROptions) {
     { name: "organizationName", value: options.organization || "Personal" },
   ]);
 
+  // Generate a random nonce to guarantee CSR uniqueness and a unique hash
+  const nonce = forge.util.bytesToHex(forge.random.getBytesSync(16));
+
   csr.setAttributes([
     {
       name: "extensionRequest",
@@ -99,6 +102,10 @@ export function generateCSR(options: CSROptions) {
           altNames: [{ type: 2, value: options.domain }],
         },
       ],
+    },
+    {
+      name: "challengePassword",
+      value: nonce,
     },
   ]);
 
