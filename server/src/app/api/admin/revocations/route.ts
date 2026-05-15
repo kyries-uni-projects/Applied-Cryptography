@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logAction } from "@/lib/audit";
+import { scApproveRevocation, scRejectRevocation } from "@/lib/sc-client";
 
 export async function GET() {
   try {
@@ -18,7 +19,7 @@ export async function GET() {
   }
 }
 
-// Approve a revocation request
+// Approve or reject a revocation request
 export async function PUT(request: NextRequest) {
   try {
     const userId = request.headers.get("x-user-id");
@@ -53,12 +54,18 @@ export async function PUT(request: NextRequest) {
         }),
       ]);
 
+      // Anchor revocation approval + CRL update on-chain (fire-and-forget)
+      scApproveRevocation(revocationId, revocation.certificate.serialNumber, revocation.reason);
+
       await logAction(userId, username, "APPROVE_REVOCATION", `Phê duyệt thu hồi chứng chỉ SN:${revocation.certificate.serialNumber.slice(0, 16)}... (user: ${revocation.user.username})`);
     } else {
       await prisma.revocationRequest.update({
         where: { id: revocationId },
         data: { status: "REJECTED" },
       });
+
+      // Mark revocation request as rejected on-chain (fire-and-forget)
+      scRejectRevocation(revocationId);
 
       await logAction(userId, username, "REJECT_REVOCATION", `Từ chối thu hồi chứng chỉ SN:${revocation.certificate.serialNumber.slice(0, 16)}... (user: ${revocation.user.username})`);
     }

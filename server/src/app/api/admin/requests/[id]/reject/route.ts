@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logAction } from "@/lib/audit";
+import { scRejectRequest } from "@/lib/sc-client";
 
 export async function POST(
   request: NextRequest,
@@ -29,6 +30,9 @@ export async function POST(
       where: { id },
       data: { status: "REJECTED", rejectReason: reason || "Không đạt yêu cầu" },
     });
+
+    // Mark request as rejected on-chain (fire-and-forget)
+    scRejectRequest(id);
 
     await logAction(userId, username, "REJECT_CSR", `Từ chối CSR #${id.slice(0, 8)} cho domain ${certRequest.domain} (user: ${certRequest.user.username}). Lý do: ${reason}`);
 

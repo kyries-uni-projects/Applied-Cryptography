@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { generateCSR } from "@/lib/crypto";
 import { logAction } from "@/lib/audit";
+import { scSubmitRequest } from "@/lib/sc-client";
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,6 +20,9 @@ export async function POST(request: NextRequest) {
     const certReq = await prisma.certificateRequest.create({
       data: { userId, keyPairId, csrPem, domain },
     });
+
+    // Anchor the CSR hash on-chain (fire-and-forget: does not block response)
+    scSubmitRequest(userId, certReq.id, domain, csrPem);
 
     await logAction(userId, username, "CREATE_CSR", `Tạo CSR cho domain ${domain}`);
     return NextResponse.json(certReq);

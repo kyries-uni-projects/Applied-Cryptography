@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { signCertificate, generateSerialNumber } from "@/lib/crypto";
 import { logAction } from "@/lib/audit";
+import { scApproveRequestAndIssueCert } from "@/lib/sc-client";
 
 export async function POST(
   request: NextRequest,
@@ -41,8 +42,8 @@ export async function POST(
       hashAlgorithm: config.hashAlgorithm,
     });
 
-    // Update request status and create certificate
-    await prisma.$transaction([
+    // Update request status and create certificate in Prisma
+    const [, newCert] = await prisma.$transaction([
       prisma.certificateRequest.update({
         where: { id },
         data: { status: "APPROVED" },
@@ -60,6 +61,19 @@ export async function POST(
         },
       }),
     ]);
+
+    // Anchor approval + certificate issuance on-chain (fire-and-forget)
+    scApproveRequestAndIssueCert(
+      id,
+      newCert.id,
+      result.serialNumber,
+      certRequest.userId,
+      result.certPem,
+      result.subjectDN,
+      result.issuerDN,
+      result.notBefore,
+      result.notAfter
+    );
 
     await logAction(userId, username, "APPROVE_CSR", `Phê duyệt CSR #${id.slice(0, 8)} cho domain ${certRequest.domain} (user: ${certRequest.user.username})`);
 

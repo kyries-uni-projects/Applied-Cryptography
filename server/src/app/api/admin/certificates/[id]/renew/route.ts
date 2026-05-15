@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { signCertificate, generateSerialNumber } from "@/lib/crypto";
 import { logAction } from "@/lib/audit";
+import { scUpdateCertificate } from "@/lib/sc-client";
 
 export async function POST(
   request: NextRequest,
@@ -33,7 +34,7 @@ export async function POST(
       return NextResponse.json({ error: "Root Certificate chưa được tạo" }, { status: 400 });
     }
 
-    // Revoke old cert
+    // Revoke old cert in Prisma
     await prisma.certificate.update({
       where: { id },
       data: { status: "REVOKED", revokedAt: new Date() },
@@ -61,6 +62,9 @@ export async function POST(
         notAfter: result.notAfter,
       },
     });
+
+    // Update the on-chain certificate record with the renewed PEM hash and validity (fire-and-forget)
+    scUpdateCertificate(newCert.id, result.certPem, result.notBefore, result.notAfter);
 
     await logAction(userId, username, "RENEW_CERT", `Gia hạn chứng chỉ SN:${cert.serialNumber.slice(0, 16)}... → SN:${newCert.serialNumber.slice(0, 16)}... (user: ${cert.user.username})`);
 

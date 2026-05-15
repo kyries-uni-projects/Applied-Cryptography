@@ -50,9 +50,11 @@ const adminLinks = [
 export default function AdminLayoutClient({
   children,
   username,
+  adminWalletAddress,
 }: {
   children: React.ReactNode;
   username: string;
+  adminWalletAddress?: string;
 }) {
   return (
     <div className="flex min-h-screen">
@@ -64,8 +66,20 @@ export default function AdminLayoutClient({
       />
       <main className="flex-1 bg-base-200">
         <div className="navbar bg-base-100 border-b border-base-content/10 px-6 shadow-sm">
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold">Quản trị Certificate Authority</h1>
+          <div className="flex-1 flex flex-col items-start justify-center">
+            <h1 className="text-lg font-semibold leading-tight">Quản trị Certificate Authority</h1>
+            {adminWalletAddress && (
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-base-content/70 font-mono">Ví Admin: {adminWalletAddress.slice(0, 8)}...{adminWalletAddress.slice(-6)}</span>
+                <button 
+                  className="btn btn-ghost btn-xs opacity-50 hover:opacity-100 px-1 min-h-0 h-4" 
+                  onClick={() => navigator.clipboard.writeText(adminWalletAddress)}
+                  title="Copy address"
+                >
+                  📋
+                </button>
+              </div>
+            )}
           </div>
           <div className="flex-none gap-2 flex items-center">
             <ThemeToggle />

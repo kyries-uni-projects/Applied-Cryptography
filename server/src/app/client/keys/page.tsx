@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 
-interface KeyPairData { id: string; label: string; publicKeyPem: string; privateKeyPem: string; keyLength: number; createdAt: string; }
+interface KeyPairData { id: string; label: string; publicKeyPem: string; privateKeyPem: string; keyLength: number; createdAt: string; blockchainAddress?: string; }
 
 export default function KeysPage() {
   const [keys, setKeys] = useState<KeyPairData[]>([]);
@@ -70,23 +70,37 @@ export default function KeysPage() {
       <div className="card bg-base-100 border border-base-content/10 shadow-md overflow-hidden">
         <div className="overflow-x-auto">
           <table className="table">
-            <thead><tr><th>Nhãn</th><th>Độ dài</th><th>Ngày tạo</th><th>Hành động</th></tr></thead>
+            <thead><tr><th>Nhãn</th><th>Địa chỉ ví (Blockchain)</th><th>Độ dài</th><th>Ngày tạo</th><th>Hành động</th></tr></thead>
             <tbody>
               {keys.map((k) => (
                 <tr key={k.id} className="hover">
                   <td className="font-medium">{k.label}</td>
+                  <td className="font-mono text-xs">
+                    {k.blockchainAddress ? (
+                      <div className="flex items-center gap-2">
+                        <span>{k.blockchainAddress.slice(0, 8)}...{k.blockchainAddress.slice(-6)}</span>
+                        <button
+                          className="btn btn-ghost btn-xs"
+                          onClick={() => navigator.clipboard.writeText(k.blockchainAddress!)}
+                          title="Copy address"
+                        >
+                          📋
+                        </button>
+                      </div>
+                    ) : "N/A"}
+                  </td>
                   <td>{k.keyLength} bits</td>
                   <td className="text-xs">{new Date(k.createdAt).toLocaleString("vi-VN")}</td>
                   <td>
                     <div className="flex gap-1">
-                      <button className="btn btn-ghost btn-xs" onClick={() => setViewKey(k)}>Xem</button>
+                      <button className="btn btnghost btn-xs" onClick={() => setViewKey(k)}>Xem</button>
                       <a href={`data:application/x-pem-file;charset=utf-8,${encodeURIComponent(k.publicKeyPem)}`} download={`${k.label}-public.pem`} className="btn btn-outline btn-xs">Public</a>
                       <a href={`data:application/x-pem-file;charset=utf-8,${encodeURIComponent(k.privateKeyPem)}`} download={`${k.label}-private.pem`} className="btn btn-outline btn-xs btn-warning">Private</a>
                     </div>
                   </td>
                 </tr>
               ))}
-              {keys.length === 0 && <tr><td colSpan={4} className="text-center py-8 text-base-content/50">Chưa có cặp khóa nào. Tạo mới ở trên.</td></tr>}
+              {keys.length === 0 && <tr><td colSpan={5} className="text-center py-8 text-base-content/50">Chưa có cặp khóa nào. Tạo mới ở trên.</td></tr>}
             </tbody>
           </table>
         </div>
