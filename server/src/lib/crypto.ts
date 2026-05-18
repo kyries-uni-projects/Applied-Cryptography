@@ -1,4 +1,7 @@
 import forge from "node-forge";
+import { CertificateRevocationList, Certificate as PKIJSCertificate, Time, RevokedCertificate } from "pkijs";
+import { fromBER, Integer } from "asn1js";
+import { webcrypto } from "crypto";
 
 // ===================== KEY GENERATION =====================
 
@@ -30,9 +33,7 @@ export function generateRootCertificate(options: RootCertOptions) {
 
   cert.validity.notBefore = new Date();
   cert.validity.notAfter = new Date();
-  cert.validity.notAfter.setFullYear(
-    cert.validity.notBefore.getFullYear() + Math.ceil(options.validityDays / 365)
-  );
+  cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + Math.ceil(options.validityDays / 365));
 
   const attrs = [
     { name: "commonName", value: options.commonName || "CA Root Certificate" },
@@ -142,9 +143,7 @@ export function signCertificate(options: SignCertOptions) {
 
   cert.validity.notBefore = new Date();
   cert.validity.notAfter = new Date();
-  cert.validity.notAfter.setDate(
-    cert.validity.notBefore.getDate() + options.validityDays
-  );
+  cert.validity.notAfter.setDate(cert.validity.notBefore.getDate() + options.validityDays);
 
   cert.setSubject(csr.subject.attributes);
   cert.setIssuer(rootCert.subject.attributes);
@@ -184,12 +183,8 @@ export function signCertificate(options: SignCertOptions) {
   return {
     certPem: forge.pki.certificateToPem(cert),
     serialNumber: cert.serialNumber,
-    subjectDN: cert.subject.attributes
-      .map((a) => `${a.shortName || a.name}=${a.value}`)
-      .join(", "),
-    issuerDN: cert.issuer.attributes
-      .map((a) => `${a.shortName || a.name}=${a.value}`)
-      .join(", "),
+    subjectDN: cert.subject.attributes.map((a) => `${a.shortName || a.name}=${a.value}`).join(", "),
+    issuerDN: cert.issuer.attributes.map((a) => `${a.shortName || a.name}=${a.value}`).join(", "),
     notBefore: cert.validity.notBefore,
     notAfter: cert.validity.notAfter,
   };
@@ -203,41 +198,81 @@ export interface CRLEntry {
   reason?: string;
 }
 
-export function generateCRL(
+export async function generateCRL(
   rootCertPem: string,
   rootKeyPem: string,
   entries: CRLEntry[],
   hashAlgorithm: string = "SHA-256",
-  nextUpdateDays: number = 30
+  nextUpdateDays: number = 30,
 ) {
-  const rootCert = forge.pki.certificateFromPem(rootCertPem);
-  const rootKey = forge.pki.privateKeyFromPem(rootKeyPem);
+  // Set up pkijs crypto engine with Node.js built-in WebCrypto
+  // setEngine("nodeEngine", new CryptoEngine({ name: "nodeEngine", crypto: webcrypto as unknown as Crypto }) as any);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pki = forge.pki as any;
+  // Parse root certificate PEM → DER → pkijs Certificate (to extract issuer)
+  // https://gist.github.com/adisbladis/c84e533e591b1737fedd26658021fef2
+  const rootCertB64 = rootCertPem.replace(/-----[^-]+-----/g, "").replace(/\s+/g, "");
+  const rootCertBuf = Buffer.from(rootCertB64, "base64");
+  const rootCertArrayBuf = new Uint8Array(rootCertBuf).buffer;
+  const rootCertAsn1 = fromBER(rootCertArrayBuf);
+  const rootCertPkijs = new PKIJSCertificate({ schema: rootCertAsn1.result });
 
-  const crl = pki.createCrl();
-  crl.setIssuer(rootCert.subject.attributes);
+  // Import root private key as WebCrypto CryptoKey (via PKCS#8)
+  // Idea from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey#pkcs_8_import
+  const rootForgeKey = forge.pki.privateKeyFromPem(rootKeyPem);
+  const pkcs8Asn1 = forge.pki.wrapRsaPrivateKey(forge.pki.privateKeyToAsn1(rootForgeKey));
+  const pkcs8Buf = Buffer.from(forge.asn1.toDer(pkcs8Asn1).getBytes(), "binary");
+  const pkcs8ArrayBuf = pkcs8Buf.buffer.slice(pkcs8Buf.byteOffset, pkcs8Buf.byteOffset + pkcs8Buf.byteLength);
+  const cryptoKey = await webcrypto.subtle.importKey(
+    "pkcs8", 
+    pkcs8ArrayBuf, 
+    { name: "RSA-PSS", hash: hashAlgorithm }, 
+    false, 
+    ["sign"]
+  );
 
+  // Build CRL
   const thisUpdate = new Date();
   const nextUpdateDate = new Date();
   nextUpdateDate.setDate(thisUpdate.getDate() + nextUpdateDays);
 
-  crl.thisUpdate = thisUpdate;
-  crl.nextUpdate = nextUpdateDate;
+  const crl = new CertificateRevocationList({
+    version: 1,
+    issuer: rootCertPkijs.subject,
+    thisUpdate: new Time({ type: 0, value: thisUpdate }),
+    nextUpdate: new Time({ type: 0, value: nextUpdateDate }),
+  });
 
-  for (const entry of entries) {
-    crl.addRevokedCertificate({
-      serialNumber: entry.serialNumber,
-      revocationDate: entry.revocationDate,
-    });
+  // Add revoked certificates
+  if (entries.length > 0) {
+    crl.revokedCertificates = [];
+    for (const entry of entries) {
+      // Ensure serial number is even-length hex string
+      // E.g. "1" → "01", "0A" → "0A", "1234" → "1234"
+      const serialHex = entry.serialNumber.length % 2 === 0 ? entry.serialNumber : `0${entry.serialNumber}`;
+      const serialBuf = Buffer.from(serialHex, "hex");
+      const serialArrayBuf = serialBuf.buffer.slice(serialBuf.byteOffset, serialBuf.byteOffset + serialBuf.byteLength);
+      crl.revokedCertificates.push(
+        new RevokedCertificate({
+          userCertificate: new Integer({ valueHex: serialArrayBuf }),
+          revocationDate: new Time({ type: 0, value: entry.revocationDate }),
+        }),
+      );
+    }
   }
 
-  const md = getMessageDigest(hashAlgorithm);
-  crl.sign(rootKey, md);
+  // Sign the CRL
+  await crl.sign(cryptoKey, hashAlgorithm);
+
+  // Export to PEM
+  const crlDerBuf = Buffer.from(crl.toSchema(true).toBER(false));
+  const crlB64 = crlDerBuf
+    .toString("base64")
+    .match(/.{1,64}/g)!
+    .join("\n");
+  const crlPem = `-----BEGIN X509 CRL-----\n${crlB64}\n-----END X509 CRL-----`;
 
   return {
-    crlPem: pki.crlToPem(crl),
+    crlPem,
     issuedAt: thisUpdate,
     nextUpdate: nextUpdateDate,
   };
@@ -250,12 +285,8 @@ export function parseCertificate(certPem: string) {
     const cert = forge.pki.certificateFromPem(certPem);
     return {
       serialNumber: cert.serialNumber,
-      subjectDN: cert.subject.attributes
-        .map((a) => `${a.shortName || a.name}=${a.value}`)
-        .join(", "),
-      issuerDN: cert.issuer.attributes
-        .map((a) => `${a.shortName || a.name}=${a.value}`)
-        .join(", "),
+      subjectDN: cert.subject.attributes.map((a) => `${a.shortName || a.name}=${a.value}`).join(", "),
+      issuerDN: cert.issuer.attributes.map((a) => `${a.shortName || a.name}=${a.value}`).join(", "),
       notBefore: cert.validity.notBefore,
       notAfter: cert.validity.notAfter,
       publicKey: forge.pki.publicKeyToPem(cert.publicKey as forge.pki.rsa.PublicKey),
@@ -274,9 +305,7 @@ export function parseCSR(csrPem: string) {
   try {
     const csr = forge.pki.certificationRequestFromPem(csrPem);
     return {
-      subject: csr.subject.attributes
-        .map((a) => `${a.shortName || a.name}=${a.value}`)
-        .join(", "),
+      subject: csr.subject.attributes.map((a) => `${a.shortName || a.name}=${a.value}`).join(", "),
       publicKey: forge.pki.publicKeyToPem(csr.publicKey as forge.pki.rsa.PublicKey),
       valid: csr.verify(),
     };

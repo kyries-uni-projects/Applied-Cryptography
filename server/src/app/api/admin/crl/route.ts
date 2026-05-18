@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       revocationDate: cert.revokedAt || new Date(),
     }));
 
-    const result = generateCRL(
+    const result = await generateCRL(
       config.rootCertPem,
       config.rootKeyPem,
       entries,

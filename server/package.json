@@ -18,11 +18,14 @@
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.7.0",
     "@prisma/client": "^7.7.0",
+    "asn1js": "^3.0.10",
     "bcryptjs": "^3.0.3",
     "ethers": "^6.16.0",
     "jose": "^6.2.2",
     "next": "16.2.4",
     "node-forge": "^1.4.0",
+    "pkijs": "^3.4.0",
+    "pvutils": "^1.1.5",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
