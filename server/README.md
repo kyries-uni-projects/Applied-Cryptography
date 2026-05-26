@@ -35,26 +35,21 @@ The system utilizes a deterministic wallet mechanism for the CA root. Instead of
 yarn install  # or npm install
 
 # Generate Prisma Client
-npm run db:generate
+yarn db:generate
+
+# Copy `.env.example` to `.env` in the `server` root:
+cp .env.example .env
 
 # Push schema to SQLite database
-npm run db:push
+yarn db:push
 
 # Seed the database (creates default CA config and admin user)
-npm run db:seed
-```
-
-### 2. Environment Variables
-
-Copy `.env.example` to `.env` in the `server` root:
-
-```bash
-cp .env.example .env
+yarn db:seed
 ```
 
 Ensure you have the RPC URL and (optionally) your deployer private key set up.
 
-### 3. Smart Contract Deployment
+### 2. Smart Contract Deployment
 
 The smart contract must be deployed to the Avalanche Fuji Testnet.
 
@@ -70,7 +65,7 @@ forge script script/DeployCertificateRegistry.s.sol --rpc-url https://api.avax-t
 
 **Important**: Note the deployed `CertificateRegistry` address from the output and update your `CERTIFICATE_REGISTRY_ADDRESS` in `.env`.
 
-### 4. Authorize the CA Root Wallet
+### 3. Authorize the CA Root Wallet
 
 Because the backend uses a deterministic CA Root wallet, you must authorize this wallet on your deployed smart contract.
 
