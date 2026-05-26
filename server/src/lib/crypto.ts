@@ -45,12 +45,20 @@ function getOIDName(oid: string): string {
 
 // ===================== KEY GENERATION =====================
 
-export function generateKeyPair(bits: number = 2048) {
+export function generateKeyPair(password: string, bits: number = 2048) {
 	const keys = forge.pki.rsa.generateKeyPair(bits);
 	return {
 		publicKeyPem: forge.pki.publicKeyToPem(keys.publicKey),
-		privateKeyPem: forge.pki.privateKeyToPem(keys.privateKey),
+		privateKeyPem: forge.pki.encryptRsaPrivateKey(keys.privateKey, password),
 	};
+}
+
+export function decryptPrivateKeyToPem(encryptedPem: string, password: string): string {
+  const privateKey = forge.pki.decryptRsaPrivateKey(encryptedPem, password);
+  if (!privateKey) {
+    throw new Error("Mật khẩu giải mã không đúng hoặc dữ liệu khoá bị hỏng");
+  }
+  return forge.pki.privateKeyToPem(privateKey);
 }
 
 // ===================== ROOT CERTIFICATE =====================
@@ -62,6 +70,7 @@ export interface RootCertOptions {
 	commonName?: string;
 	organization?: string;
 	country?: string;
+	passphrase?: string;
 }
 
 export function generateRootCertificate(options: RootCertOptions) {
@@ -101,9 +110,13 @@ export function generateRootCertificate(options: RootCertOptions) {
 	const md = getMessageDigest(options.hashAlgorithm);
 	cert.sign(keys.privateKey, md);
 
+	const encryptedRootKey = options.passphrase 
+    ? forge.pki.encryptRsaPrivateKey(keys.privateKey, options.passphrase)
+    : forge.pki.privateKeyToPem(keys.privateKey);
+
 	return {
 		certPem: forge.pki.certificateToPem(cert),
-		privateKeyPem: forge.pki.privateKeyToPem(keys.privateKey),
+		privateKeyPem: encryptedRootKey,
 		publicKeyPem: forge.pki.publicKeyToPem(keys.publicKey),
 	};
 }
@@ -165,12 +178,17 @@ export interface SignCertOptions {
 	serialNumber: string;
 	validityDays: number;
 	hashAlgorithm: string;
+	passphrase?: string;
 }
 
 export function signCertificate(options: SignCertOptions) {
 	const csr = forge.pki.certificationRequestFromPem(options.csrPem);
 	const rootCert = forge.pki.certificateFromPem(options.rootCertPem);
-	const rootKey = forge.pki.privateKeyFromPem(options.rootKeyPem);
+	const rootKey = options.passphrase
+		? forge.pki.decryptRsaPrivateKey(options.rootKeyPem, options.passphrase)
+		: forge.pki.privateKeyFromPem(options.rootKeyPem);
+
+	if (!rootKey) throw new Error("Không thể giải mã Root CA Key");
 
 	// Verify CSR signature
 	if (!csr.verify()) {
@@ -244,6 +262,7 @@ export async function generateCRL(
 	entries: CRLEntry[],
 	hashAlgorithm: string = "SHA-256",
 	nextUpdateDays: number = 30,
+	passphrase?: string
 ) {
 	// Set up pkijs crypto engine with Node.js built-in WebCrypto
 	// setEngine("nodeEngine", new CryptoEngine({ name: "nodeEngine", crypto: webcrypto as unknown as Crypto }) as any);
@@ -252,7 +271,12 @@ export async function generateCRL(
 
 	// Import root private key as WebCrypto CryptoKey (via PKCS#8)
 	// Idea from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey#pkcs_8_import
-	const rootForgeKey = forge.pki.privateKeyFromPem(rootKeyPem);
+	const rootForgeKey = passphrase 
+		? forge.pki.decryptRsaPrivateKey(rootKeyPem, passphrase)
+		: forge.pki.privateKeyFromPem(rootKeyPem);
+	
+	if (!rootForgeKey) throw new Error("Không thể giải mã Root CA Key để sinh CRL");
+
 	const pkcs8Asn1 = forge.pki.wrapRsaPrivateKey(forge.pki.privateKeyToAsn1(rootForgeKey));
 	const pkcs8Buf = Buffer.from(forge.asn1.toDer(pkcs8Asn1).getBytes(), "binary");
 	const pkcs8ArrayBuf = pkcs8Buf.buffer.slice(pkcs8Buf.byteOffset, pkcs8Buf.byteOffset + pkcs8Buf.byteLength);
