@@ -5,7 +5,7 @@ import { parseCertificate } from "@/lib/crypto";
 
 export default function RootCertPage() {
 	const [certPem, setCertPem] = useState("");
-	const [certInfo, setCertInfo] = useState<ReturnType<typeof parseCertificate> | null>(null);
+	const [certInfo, setCertInfo] = useState<Awaited<ReturnType<typeof parseCertificate>> | null>(null);
 	const [exists, setExists] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [generating, setGenerating] = useState(false);
@@ -56,14 +56,18 @@ export default function RootCertPage() {
 
 	// Parse cert info on client for display
 	useEffect(() => {
-		if (certPem) {
-			try {
-				const info = parseCertificate(certPem);
-				setCertInfo(info);
-			} catch {
-				setCertInfo(null);
+		const fetchCertInfo = async () => {
+			if (certPem) {
+				try {
+					const info = await parseCertificate(certPem);
+					setCertInfo(info);
+				} catch {
+					setCertInfo(null);
+				}
 			}
-		}
+		};
+
+		fetchCertInfo();
 	}, [certPem]);
 
 	if (loading) {
@@ -173,7 +177,8 @@ export default function RootCertPage() {
 									<div>
 										<p className="text-xs text-base-content/50 uppercase tracking-wide">Hiệu lực</p>
 										<p className="text-sm">
-											{new Date(certInfo.notBefore).toLocaleDateString("vi-VN")} - {new Date(certInfo.notAfter).toLocaleDateString("vi-VN")}
+											{new Date(certInfo.notBefore.value).toLocaleDateString("vi-VN")} -{" "}
+											{new Date(certInfo.notAfter.value).toLocaleDateString("vi-VN")}
 										</p>
 									</div>
 								</div>

@@ -315,7 +315,7 @@ export async function generateCRL(
 export async function parseCertificate(certPem: string) {
 	const certPkijs = pemToPkijsCert(certPem);
 	return {
-		serialNumber: certPkijs.serialNumber,
+		serialNumber: certPkijs.serialNumber.toBigInt(),
 		subjectDN: certPkijs.subject.typesAndValues.map((a) => `${getOIDName(a.type)}=${a.value.valueBlock.value}`).join(", "),
 		issuerDN: certPkijs.issuer.typesAndValues.map((a) => `${getOIDName(a.type)}=${a.value.valueBlock.value}`).join(", "),
 		notBefore: certPkijs.notBefore,
