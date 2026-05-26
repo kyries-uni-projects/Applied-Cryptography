@@ -17,6 +17,7 @@ export default function KeysPage() {
 	const [generating, setGenerating] = useState(false);
 	const [label, setLabel] = useState("");
 	const [keyLength, setKeyLength] = useState(2048);
+	const [password, setPassword] = useState("");
 	const [viewKey, setViewKey] = useState<KeyPairData | null>(null);
 
 	const fetchKeys = useCallback(async () => {
@@ -31,18 +32,22 @@ export default function KeysPage() {
 
 	const handleGenerate = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!label) return;
+		if (!label || !password) return;
 		setGenerating(true);
 		try {
 			const res = await fetch("/api/client/keys", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ label, keyLength }),
+				body: JSON.stringify({ label, keyLength, password }),
 			});
 			if (res.ok) {
 				setLabel("");
+				setPassword("")
 				fetchKeys();
-			}
+			} else {
+            const data = await res.json();
+            alert(data.error || "Có lỗi xảy ra khi tạo khóa");
+        	}
 		} finally {
 			setGenerating(false);
 		}
@@ -75,6 +80,18 @@ export default function KeysPage() {
 								value={label}
 								onChange={(e) => setLabel(e.target.value)}
 								placeholder="VD: Website Key"
+								required
+							/>
+						</div>
+						<div className="flex flex-col gap-1 flex-1 min-w-[200px]">
+							<label className="label">Mật khẩu bảo vệ khóa *</label>
+							<input
+								type="password" 
+								className="input input-bordered"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								placeholder="Tối thiểu 6 ký tự"
+								minLength={6}
 								required
 							/>
 						</div>

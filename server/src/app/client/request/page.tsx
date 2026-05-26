@@ -13,6 +13,7 @@ export default function RequestPage() {
 	const [domain, setDomain] = useState("");
 	const [country, setCountry] = useState("VN");
 	const [organization, setOrganization] = useState("");
+	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(true);
 	const [submitting, setSubmitting] = useState(false);
 	const [message, setMessage] = useState({ type: "", text: "" });
@@ -35,13 +36,14 @@ export default function RequestPage() {
 			const res = await fetch("/api/client/csr", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ keyPairId, domain, country, organization }),
+				body: JSON.stringify({ keyPairId, domain, country, organization, password }),
 			});
 			const data = await res.json();
 			if (res.ok) {
 				setMessage({ type: "success", text: `CSR đã được tạo và gửi cho Admin duyệt! (Domain: ${domain})` });
 				setDomain("");
 				setOrganization("");
+				setPassword("")
 			} else {
 				setMessage({ type: "error", text: data.error });
 			}
@@ -109,6 +111,17 @@ export default function RequestPage() {
 										value={organization}
 										onChange={(e) => setOrganization(e.target.value)}
 										placeholder="My Company"
+									/>
+								</div>
+								<div className="flex flex-col gap-1">
+									<label className="label font-medium text-warning">Mật khẩu giải mã khóa *</label>
+									<input
+										type="password"
+										className="input input-bordered input-warning"
+										value={password}
+										onChange={(e) => setPassword(e.target.value)}
+										placeholder="Nhập mật khẩu bạn đã đặt lúc tạo khóa"
+										required
 									/>
 								</div>
 							</div>

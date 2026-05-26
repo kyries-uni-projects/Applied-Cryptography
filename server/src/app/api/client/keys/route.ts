@@ -22,11 +22,12 @@ export async function POST(request: NextRequest) {
   try {
     const userId = request.headers.get("x-user-id")!;
     const username = request.headers.get("x-username") || "unknown";
-    const { label, keyLength } = await request.json();
+    const { label, keyLength, password } = await request.json();
 
     if (!label) return NextResponse.json({ error: "Label là bắt buộc" }, { status: 400 });
+    if (!password || password.length < 6) return NextResponse.json({ error: "Yêu cầu mật khẩu tối thiểu 6 ký tự để bảo vệ khoá" }, { status: 400 });
 
-    const keys = generateKeyPair(keyLength || 2048);
+    const keys = generateKeyPair(password, keyLength || 2048);
     const keyPair = await prisma.keyPair.create({
       data: { userId, label, publicKeyPem: keys.publicKeyPem, privateKeyPem: keys.privateKeyPem, keyLength: keyLength || 2048 },
     });

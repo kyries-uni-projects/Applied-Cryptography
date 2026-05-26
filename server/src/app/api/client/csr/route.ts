@@ -3,19 +3,23 @@ import { prisma } from "@/lib/db";
 import { generateCSR } from "@/lib/crypto";
 import { logAction } from "@/lib/audit";
 import { scSubmitRequest } from "@/lib/sc-client";
+import { decryptPrivateKeyToPem } from "@/lib/crypto";
 
 export async function POST(request: NextRequest) {
   try {
     const userId = request.headers.get("x-user-id")!;
     const username = request.headers.get("x-username") || "unknown";
-    const { keyPairId, domain, country, organization } = await request.json();
+    const { keyPairId, domain, country, organization, password } = await request.json();
 
     if (!keyPairId || !domain) return NextResponse.json({ error: "Key pair và domain là bắt buộc" }, { status: 400 });
 
     const keyPair = await prisma.keyPair.findFirst({ where: { id: keyPairId, userId } });
     if (!keyPair) return NextResponse.json({ error: "Key pair không tồn tại" }, { status: 404 });
 
-    const csrPem = generateCSR({ privateKeyPem: keyPair.privateKeyPem, domain, country, organization });
+    const decryptedPem = decryptPrivateKeyToPem(keyPair.privateKeyPem, password);
+    if (!decryptedPem) return NextResponse.json({ error: "Mật khẩu không hợp lệ" }, { status: 401 });
+
+    const csrPem = generateCSR({ privateKeyPem: decryptedPem, domain, country, organization });
 
     const certReq = await prisma.certificateRequest.create({
       data: { userId, keyPairId, csrPem, domain },
