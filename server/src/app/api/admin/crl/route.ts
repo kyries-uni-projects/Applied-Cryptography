@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { generateCRL } from "@/lib/crypto";
 import { logAction } from "@/lib/audit";
 
+const MASTER_KEY = process.env.CA_SECRET_PASSPHRASE;
+
 export async function GET() {
   try {
     const crl = await prisma.cRL.findFirst({
@@ -39,7 +41,9 @@ export async function POST(request: NextRequest) {
       config.rootCertPem,
       config.rootKeyPem,
       entries,
-      config.hashAlgorithm
+      config.hashAlgorithm,
+      30,
+      MASTER_KEY
     );
 
     await prisma.cRL.create({

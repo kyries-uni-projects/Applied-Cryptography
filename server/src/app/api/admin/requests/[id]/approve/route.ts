@@ -4,6 +4,8 @@ import { signCertificate, generateSerialNumber } from "@/lib/crypto";
 import { logAction } from "@/lib/audit";
 import { scApproveRequestAndIssueCert } from "@/lib/sc-client";
 
+const MASTER_KEY = process.env.CA_SECRET_PASSPHRASE;
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -40,6 +42,7 @@ export async function POST(
       serialNumber,
       validityDays: config.validityDays,
       hashAlgorithm: config.hashAlgorithm,
+      passphrase: MASTER_KEY,
     });
 
     // Update request status and create certificate in Prisma

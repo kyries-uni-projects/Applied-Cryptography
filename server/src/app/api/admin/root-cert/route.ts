@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { generateRootCertificate } from "@/lib/crypto";
 import { logAction } from "@/lib/audit";
 
+const MASTER_KEY = process.env.CA_SECRET_PASSPHRASE;
+
 export async function POST(request: NextRequest) {
   try {
     const userId = request.headers.get("x-user-id");
@@ -23,6 +25,7 @@ export async function POST(request: NextRequest) {
       commonName,
       organization,
       country,
+      passphrase: MASTER_KEY,
     });
 
     await prisma.caConfig.update({

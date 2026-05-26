@@ -4,6 +4,8 @@ import { signCertificate, generateSerialNumber } from "@/lib/crypto";
 import { logAction } from "@/lib/audit";
 import { scUpdateCertificate } from "@/lib/sc-client";
 
+const MASTER_KEY = process.env.CA_SECRET_PASSPHRASE;
+
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
@@ -65,6 +67,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 			serialNumber,
 			validityDays: config.validityDays,
 			hashAlgorithm: config.hashAlgorithm,
+			passphrase: MASTER_KEY,
 		});
 
 		const newCert = await prisma.$transaction(async (tx) => {
