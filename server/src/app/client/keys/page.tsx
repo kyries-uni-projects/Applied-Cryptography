@@ -67,10 +67,8 @@ export default function KeysPage() {
 				<div className="card-body">
 					<h3 className="card-title text-lg">Tạo cặp khóa mới</h3>
 					<form onSubmit={handleGenerate} className="flex flex-wrap gap-4 items-end">
-						<div className="form-control flex-1 min-w-[200px]">
-							<label className="label">
-								<span className="label-text">Tên / Nhãn</span>
-							</label>
+						<div className="flex flex-col gap-1 flex-1 min-w-[200px]">
+							<label className="label">Tên / Nhãn</label>
 							<input
 								type="text"
 								className="input input-bordered"
@@ -80,10 +78,8 @@ export default function KeysPage() {
 								required
 							/>
 						</div>
-						<div className="form-control w-40">
-							<label className="label">
-								<span className="label-text">Độ dài khóa</span>
-							</label>
+						<div className="flex flex-col gap-1 w-40">
+							<label className="label">Dộ dài khóa</label>
 							<select className="select select-bordered" value={keyLength} onChange={(e) => setKeyLength(parseInt(e.target.value))}>
 								<option value={1024}>1024 bits</option>
 								<option value={2048}>2048 bits</option>

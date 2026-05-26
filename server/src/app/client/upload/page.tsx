@@ -86,10 +86,8 @@ export default function UploadPage() {
 				<div className="card-body">
 					<h3 className="card-title">Upload Certificate PEM</h3>
 					<form onSubmit={handleUpload} className="space-y-4">
-						<div className="form-control">
-							<label className="label">
-								<span className="label-text font-medium">Nhãn (tùy chọn)</span>
-							</label>
+						<div className="flex flex-col gap-1">
+							<label className="label font-medium">Nhãn (tùy chọn)</label>
 							<input
 								type="text"
 								className="input input-bordered"
@@ -98,18 +96,17 @@ export default function UploadPage() {
 								placeholder="VD: Google SSL Cert"
 							/>
 						</div>
-						<div className="form-control">
-							<label className="label">
-								<span className="label-text font-medium">File PEM hoặc paste nội dung</span>
-							</label>
+						<div className="flex flex-col gap-1">
+							<label className="label font-medium">File PEM hoặc paste nội dung</label>
 							<input type="file" accept=".pem,.crt,.cer" onChange={handleFileChange} className="file-input file-input-bordered w-full" />
 						</div>
-						<div className="form-control">
+						<div className="flex flex-col gap-1">
+							<label className="label font-medium">Nội dung PEM</label>
 							<textarea
 								className="textarea textarea-bordered h-32 font-mono text-xs"
 								value={certPem}
 								onChange={(e) => setCertPem(e.target.value)}
-								placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----"
+								placeholder="-----BEGIN CERTIFICATE-----&#13;...&#13;-----END CERTIFICATE-----"
 							/>
 						</div>
 						<div className="card-actions justify-end">

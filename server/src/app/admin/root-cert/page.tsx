@@ -108,22 +108,16 @@ export default function RootCertPage() {
 						<div className="divider"></div>
 
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-							<div className="form-control">
-								<label className="label">
-									<span className="label-text font-medium">Common Name (CN)</span>
-								</label>
+							<div className="flex flex-col gap-1">
+								<label className="label font-medium">Common Name (CN)</label>
 								<input type="text" className="input input-bordered" value={commonName} onChange={(e) => setCommonName(e.target.value)} />
 							</div>
-							<div className="form-control">
-								<label className="label">
-									<span className="label-text font-medium">Organization (O)</span>
-								</label>
+							<div className="flex flex-col gap-1">
+								<label className="label font-medium">Organization (O)</label>
 								<input type="text" className="input input-bordered" value={organization} onChange={(e) => setOrganization(e.target.value)} />
 							</div>
-							<div className="form-control">
-								<label className="label">
-									<span className="label-text font-medium">Country (C)</span>
-								</label>
+							<div className="flex flex-col gap-1">
+								<label className="label font-medium">Country (C)</label>
 								<input type="text" className="input input-bordered" value={country} onChange={(e) => setCountry(e.target.value)} maxLength={2} />
 							</div>
 						</div>

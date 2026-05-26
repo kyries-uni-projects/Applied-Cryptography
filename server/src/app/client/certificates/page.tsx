@@ -38,8 +38,8 @@ export default function CertificatesPage() {
 	const badge = (s: string) => {
 		if (s === "PENDING") return <span className="badge badge-warning badge-sm">Chờ duyệt</span>;
 		if (s === "APPROVED") return <span className="badge badge-success badge-sm">Đã duyệt</span>;
-		if (s === "ACTIVE") return <span className="badge badge-success badge-sm">Active</span>;
-		if (s === "REVOKED") return <span className="badge badge-error badge-sm">Revoked</span>;
+		if (s === "ACTIVE") return <span className="badge badge-success badge-sm">Hoạt động</span>;
+		if (s === "REVOKED") return <span className="badge badge-error badge-sm">Đã thu hồi</span>;
 		return <span className="badge badge-error badge-sm">Từ chối</span>;
 	};
 

@@ -101,7 +101,7 @@ export default function CertificatesPage() {
 									</td>
 									<td>
 										<span className={`badge ${c.status === "ACTIVE" ? "badge-success" : "badge-error"}`}>
-											{c.status === "ACTIVE" ? "Active" : "Revoked"}
+											{c.status === "ACTIVE" ? "Hoạt động" : "Đã thu hồi"}
 										</span>
 									</td>
 									<td>
