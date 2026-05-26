@@ -3,8 +3,7 @@ import { prisma } from "@/lib/db";
 import { signCertificate, generateSerialNumber } from "@/lib/crypto";
 import { logAction } from "@/lib/audit";
 import { scApproveRequestAndIssueCert } from "@/lib/sc-client";
-
-const MASTER_KEY = process.env.CA_SECRET_PASSPHRASE;
+import { MASTER_KEY } from "@/lib/env";
 
 export async function POST(
   request: NextRequest,

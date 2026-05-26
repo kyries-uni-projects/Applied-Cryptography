@@ -70,7 +70,7 @@ export interface RootCertOptions {
 	commonName?: string;
 	organization?: string;
 	country?: string;
-	passphrase?: string;
+	passphrase: string;
 }
 
 export function generateRootCertificate(options: RootCertOptions) {
@@ -110,9 +110,7 @@ export function generateRootCertificate(options: RootCertOptions) {
 	const md = getMessageDigest(options.hashAlgorithm);
 	cert.sign(keys.privateKey, md);
 
-	const encryptedRootKey = options.passphrase 
-    ? forge.pki.encryptRsaPrivateKey(keys.privateKey, options.passphrase)
-    : forge.pki.privateKeyToPem(keys.privateKey);
+	const encryptedRootKey = forge.pki.encryptRsaPrivateKey(keys.privateKey, options.passphrase);
 
 	return {
 		certPem: forge.pki.certificateToPem(cert),
@@ -178,16 +176,13 @@ export interface SignCertOptions {
 	serialNumber: string;
 	validityDays: number;
 	hashAlgorithm: string;
-	passphrase?: string;
+	passphrase: string;
 }
 
 export function signCertificate(options: SignCertOptions) {
 	const csr = forge.pki.certificationRequestFromPem(options.csrPem);
 	const rootCert = forge.pki.certificateFromPem(options.rootCertPem);
-	const rootKey = options.passphrase
-		? forge.pki.decryptRsaPrivateKey(options.rootKeyPem, options.passphrase)
-		: forge.pki.privateKeyFromPem(options.rootKeyPem);
-
+	const rootKey = forge.pki.decryptRsaPrivateKey(options.rootKeyPem, options.passphrase);
 	if (!rootKey) throw new Error("Không thể giải mã Root CA Key");
 
 	// Verify CSR signature
@@ -262,7 +257,7 @@ export async function generateCRL(
 	entries: CRLEntry[],
 	hashAlgorithm: string = "SHA-256",
 	nextUpdateDays: number = 30,
-	passphrase?: string
+	passphrase: string
 ) {
 	// Set up pkijs crypto engine with Node.js built-in WebCrypto
 	// setEngine("nodeEngine", new CryptoEngine({ name: "nodeEngine", crypto: webcrypto as unknown as Crypto }) as any);
@@ -271,9 +266,7 @@ export async function generateCRL(
 
 	// Import root private key as WebCrypto CryptoKey (via PKCS#8)
 	// Idea from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey#pkcs_8_import
-	const rootForgeKey = passphrase 
-		? forge.pki.decryptRsaPrivateKey(rootKeyPem, passphrase)
-		: forge.pki.privateKeyFromPem(rootKeyPem);
+	const rootForgeKey = forge.pki.decryptRsaPrivateKey(rootKeyPem, passphrase);
 	
 	if (!rootForgeKey) throw new Error("Không thể giải mã Root CA Key để sinh CRL");
 

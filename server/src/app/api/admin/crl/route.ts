@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { generateCRL } from "@/lib/crypto";
 import { logAction } from "@/lib/audit";
-
-const MASTER_KEY = process.env.CA_SECRET_PASSPHRASE;
+import { MASTER_KEY } from "@/lib/env";
 
 export async function GET() {
   try {
