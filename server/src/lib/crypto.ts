@@ -359,6 +359,38 @@ export function parseCSR(csrPem: string) {
 	}
 }
 
+// ===================== CRL PARSING =====================
+
+export function parseCRL(crlPem: string) {
+	const b64 = crlPem.replace(/-----[^-]+-----/g, "").replace(/\s+/g, "");
+	const buf = Buffer.from(b64, "base64");
+	const arrayBuf = new Uint8Array(buf).buffer;
+	const asn1 = fromBER(arrayBuf);
+	const crl = new CertificateRevocationList({ schema: asn1.result });
+
+	const issuerDN = crl.issuer.typesAndValues
+		.map((a) => `${getOIDName(a.type)}=${a.value.valueBlock.value}`)
+		.join(", ");
+
+	const revokedEntries = (crl.revokedCertificates ?? []).map((rc) => {
+		const serialHex = Buffer.from(rc.userCertificate.valueBlock.valueHexView).toString("hex");
+		return {
+			serialNumber: serialHex,
+			revocationDate: rc.revocationDate.value.toISOString(),
+		};
+	});
+
+	return {
+		version: (crl.version ?? 0) + 1,
+		issuerDN,
+		thisUpdate: crl.thisUpdate.value.toISOString(),
+		nextUpdate: crl.nextUpdate?.value.toISOString() ?? null,
+		signatureAlgorithm: getOIDName(crl.signatureAlgorithm.algorithmId),
+		revokedCertificates: revokedEntries,
+		totalRevoked: revokedEntries.length,
+	};
+}
+
 // ===================== HELPERS =====================
 
 function getMessageDigest(algorithm: string) {

@@ -73,7 +73,7 @@ Because the backend uses a deterministic CA Root wallet, you must authorize this
 2. Using your deployer private key, grant admin rights to the CA Root Wallet:
 
 ```bash
-cast send <YOUR_DEPLOYED_CONTRACT_ADDRESS> "addAdmin(address)" <CA_ROOT_WALLET_ADDRESS> --rpc-url https://api.avax-test.network/ext/bc/C/rpc --private-key $PRIVATE_KEY
+cast send <YOUR_DEPLOYED_CONTRACT_ADDRESS> "addAdmin(address)" <CA_ROOT_WALLET_ADDRESS> --rpc-url https://api.avax-test.network/ext/bc/C/rpc --private-key $DEPLOYER_PRIVATE_KEY
 ```
 
 ## Running Locally

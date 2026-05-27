@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { generateCRL } from "@/lib/crypto";
+import { generateCRL, parseCRL } from "@/lib/crypto";
 import { logAction } from "@/lib/audit";
 import { MASTER_KEY } from "@/lib/env";
 
@@ -9,7 +9,10 @@ export async function GET() {
     const crl = await prisma.cRL.findFirst({
       orderBy: { issuedAt: "desc" },
     });
-    return NextResponse.json(crl);
+    if (!crl?.crlPem) return NextResponse.json(null);
+
+    const parsed = parseCRL(crl.crlPem);
+    return NextResponse.json({ ...crl, parsed });
   } catch (error) {
     console.error("Get CRL error:", error);
     return NextResponse.json({ error: "Lỗi server" }, { status: 500 });
