@@ -26,13 +26,13 @@ export async function POST(
       return NextResponse.json({ error: "Yêu cầu đã được xử lý" }, { status: 400 });
     }
 
+    // 3. Anchor rejection on-chain
+    await scRejectRequest(id);
+
     await prisma.certificateRequest.update({
       where: { id },
       data: { status: "REJECTED", rejectReason: reason || "Không đạt yêu cầu" },
     });
-
-    // Mark request as rejected on-chain (awaits completion)
-    await scRejectRequest(id);
 
     await logAction(userId, username, "REJECT_CSR", `Từ chối CSR #${id.slice(0, 8)} cho domain ${certRequest.domain} (user: ${certRequest.user.username}). Lý do: ${reason}`);
 

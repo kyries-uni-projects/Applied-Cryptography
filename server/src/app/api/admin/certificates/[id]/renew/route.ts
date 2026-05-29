@@ -90,20 +90,32 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 			});
 		});
 
-		// Anchor revocation of old cert on-chain
-		await scRevokeCertificate(cert.serialNumber, "Superseded (Renewed)");
+		try {
+			// Anchor revocation of old cert on-chain
+			await scRevokeCertificate(cert.serialNumber, "Superseded (Renewed)");
 
-		// Issue the new certificate on-chain
-		await scIssueCertificate(
-			newCert.id,
-			newCert.serialNumber,
-			newCert.userId,
-			result.certPem,
-			result.subjectDN,
-			result.issuerDN,
-			result.notBefore,
-			result.notAfter
-		);
+			// Issue the new certificate on-chain
+			await scIssueCertificate(
+				newCert.id,
+				newCert.serialNumber,
+				newCert.userId,
+				result.certPem,
+				result.subjectDN,
+				result.issuerDN,
+				result.notBefore,
+				result.notAfter
+			);
+		} catch (err) {
+			// Revert DB on blockchain failure
+			await prisma.$transaction([
+				prisma.certificate.delete({ where: { id: newCert.id } }),
+				prisma.certificate.update({
+					where: { id: cert.id },
+					data: { status: "ACTIVE", revokedAt: null, requestId: cert.requestId },
+				}),
+			]);
+			throw err;
+		}
 
 		await logAction(
 			userId,

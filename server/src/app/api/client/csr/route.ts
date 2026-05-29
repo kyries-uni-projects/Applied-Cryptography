@@ -26,7 +26,13 @@ export async function POST(request: NextRequest) {
     });
 
     // Anchor the CSR hash on-chain (awaits completion)
-    await scSubmitRequest(userId, certReq.id, domain, csrPem);
+    try {
+      await scSubmitRequest(userId, certReq.id, domain, csrPem);
+    } catch (err) {
+      // Revert DB if blockchain fails
+      await prisma.certificateRequest.delete({ where: { id: certReq.id } });
+      throw err;
+    }
 
     await logAction(userId, username, "CREATE_CSR", `Tạo CSR cho domain ${domain}`);
     return NextResponse.json(certReq);

@@ -20,8 +20,14 @@ export async function POST(request: NextRequest) {
 
     const revocation = await prisma.revocationRequest.create({ data: { certificateId, userId, reason } });
 
-    // Submit revocation request on-chain (awaits completion)
-    await scSubmitRevocationRequest(userId, revocation.id, certificateId, reason);
+    // 3. Anchor the revocation request on-chain (awaits completion)
+    try {
+      await scSubmitRevocationRequest(userId, revocation.id, certificateId, reason);
+    } catch (err) {
+      // Revert DB if blockchain fails
+      await prisma.revocationRequest.delete({ where: { id: revocation.id } });
+      throw err;
+    }
 
     await logAction(userId, username, "REQUEST_REVOKE", `Yêu cầu thu hồi chứng chỉ SN:${cert.serialNumber.slice(0, 16)}...`);
     return NextResponse.json({ success: true });

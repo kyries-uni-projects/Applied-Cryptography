@@ -38,12 +38,12 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Chứng chỉ đã bị thu hồi" }, { status: 400 });
     }
 
+    await scRevokeCertificate(cert.serialNumber, reason || "Admin thu hồi");
+
     await prisma.certificate.update({
       where: { id: certificateId },
       data: { status: "REVOKED", revokedAt: new Date() },
     });
-
-    await scRevokeCertificate(cert.serialNumber, reason || "Admin thu hồi");
 
     await logAction(userId, username, "REVOKE_CERT", `Thu hồi chứng chỉ SN:${cert.serialNumber.slice(0, 16)}... (user: ${cert.user.username}). Lý do: ${reason || "Admin thu hồi"}`);
 

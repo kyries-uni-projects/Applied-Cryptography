@@ -64,18 +64,27 @@ export async function POST(
       }),
     ]);
 
-    // Anchor approval + certificate issuance on-chain (awaits completion)
-    await scApproveRequestAndIssueCert(
-      id,
-      newCert.id,
-      result.serialNumber,
-      certRequest.userId,
-      result.certPem,
-      result.subjectDN,
-      result.issuerDN,
-      result.notBefore,
-      result.notAfter
-    );
+    // Anchor approval + certificate // 4. Submit to blockchain (awaits completion)
+    try {
+      await scApproveRequestAndIssueCert(
+        id,
+        newCert.id,
+        result.serialNumber,
+        certRequest.userId,
+        result.certPem,
+        result.subjectDN,
+        result.issuerDN,
+        result.notBefore,
+        result.notAfter
+      );
+    } catch (err) {
+      // Revert DB if blockchain fails
+      await prisma.$transaction([
+        prisma.certificate.delete({ where: { id: newCert.id } }),
+        prisma.certificateRequest.update({ where: { id }, data: { status: "PENDING" } }),
+      ]);
+      throw err;
+    }
 
     await logAction(userId, username, "APPROVE_CSR", `Phê duyệt CSR #${id.slice(0, 8)} cho domain ${certRequest.domain} (user: ${certRequest.user.username})`);
 

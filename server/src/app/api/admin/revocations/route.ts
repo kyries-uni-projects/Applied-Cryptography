@@ -43,6 +43,9 @@ export async function PUT(request: NextRequest) {
     }
 
     if (action === "APPROVE") {
+      // Anchor revocation approval + CRL update on-chain (awaits completion)
+      await scApproveRevocation(revocationId, revocation.certificate.serialNumber, revocation.reason);
+
       await prisma.$transaction([
         prisma.revocationRequest.update({
           where: { id: revocationId },
@@ -54,11 +57,11 @@ export async function PUT(request: NextRequest) {
         }),
       ]);
 
-      // Anchor revocation approval + CRL update on-chain (awaits completion)
-      await scApproveRevocation(revocationId, revocation.certificate.serialNumber, revocation.reason);
-
       await logAction(userId, username, "APPROVE_REVOCATION", `Phê duyệt thu hồi chứng chỉ SN:${revocation.certificate.serialNumber.slice(0, 16)}... (user: ${revocation.user.username})`);
     } else {
+      // Anchor revocation rejection on-chain
+      await scRejectRevocation(revocationId);
+
       await prisma.revocationRequest.update({
         where: { id: revocationId },
         data: { status: "REJECTED" },
