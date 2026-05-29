@@ -31,8 +31,8 @@ export async function POST(
       data: { status: "REJECTED", rejectReason: reason || "Không đạt yêu cầu" },
     });
 
-    // Mark request as rejected on-chain (fire-and-forget)
-    scRejectRequest(id);
+    // Mark request as rejected on-chain (awaits completion)
+    await scRejectRequest(id);
 
     await logAction(userId, username, "REJECT_CSR", `Từ chối CSR #${id.slice(0, 8)} cho domain ${certRequest.domain} (user: ${certRequest.user.username}). Lý do: ${reason}`);
 

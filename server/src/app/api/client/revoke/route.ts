@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
 
     const revocation = await prisma.revocationRequest.create({ data: { certificateId, userId, reason } });
 
-    // Submit revocation request on-chain (fire-and-forget)
-    scSubmitRevocationRequest(userId, revocation.id, certificateId, reason);
+    // Submit revocation request on-chain (awaits completion)
+    await scSubmitRevocationRequest(userId, revocation.id, certificateId, reason);
 
     await logAction(userId, username, "REQUEST_REVOKE", `Yêu cầu thu hồi chứng chỉ SN:${cert.serialNumber.slice(0, 16)}...`);
     return NextResponse.json({ success: true });

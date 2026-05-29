@@ -25,8 +25,8 @@ export async function POST(request: NextRequest) {
       data: { userId, keyPairId, csrPem, domain },
     });
 
-    // Anchor the CSR hash on-chain (fire-and-forget: does not block response)
-    scSubmitRequest(userId, certReq.id, domain, csrPem);
+    // Anchor the CSR hash on-chain (awaits completion)
+    await scSubmitRequest(userId, certReq.id, domain, csrPem);
 
     await logAction(userId, username, "CREATE_CSR", `Tạo CSR cho domain ${domain}`);
     return NextResponse.json(certReq);

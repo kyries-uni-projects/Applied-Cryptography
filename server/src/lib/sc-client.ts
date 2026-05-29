@@ -93,8 +93,8 @@ export async function scSubmitRequest(
     await tx.wait();
     console.log(`[SC] submitRequest tx: ${tx.hash}`);
   } catch (err) {
-    // Log but do not throw: SC failure must not break the existing Prisma flow
     console.error("[SC] submitRequest failed:", err);
+    throw err;
   }
 }
 
@@ -135,6 +135,43 @@ export async function scApproveRequestAndIssueCert(
     console.log(`[SC] issueCertificate tx: ${tx2.hash}`);
   } catch (err) {
     console.error("[SC] approve+issueCert failed:", err);
+    throw err;
+  }
+}
+
+/**
+ * Called when admin issues a new certificate (e.g., during renewal without a request).
+ */
+export async function scIssueCertificate(
+  certId: string,
+  serialNumber: string,
+  userId: string,
+  certPem: string,
+  subjectDN: string,
+  issuerDN: string,
+  notBefore: Date,
+  notAfter: Date
+): Promise<void> {
+  try {
+    const wallet = await getAdminWallet();
+    const contract = getContract(wallet);
+    const certPemHash = ethers.sha256(ethers.toUtf8Bytes(certPem));
+
+    const tx = await contract.issueCertificate(
+      certId,
+      serialNumber,
+      userId,
+      certPemHash,
+      subjectDN,
+      issuerDN,
+      BigInt(Math.floor(notBefore.getTime() / 1000)),
+      BigInt(Math.floor(notAfter.getTime() / 1000))
+    );
+    await tx.wait();
+    console.log(`[SC] issueCertificate tx: ${tx.hash}`);
+  } catch (err) {
+    console.error("[SC] issueCert failed:", err);
+    throw err;
   }
 }
 
@@ -150,6 +187,7 @@ export async function scRejectRequest(requestId: string): Promise<void> {
     console.log(`[SC] rejectRequest tx: ${tx.hash}`);
   } catch (err) {
     console.error("[SC] rejectRequest failed:", err);
+    throw err;
   }
 }
 
@@ -179,6 +217,7 @@ export async function scUpdateCertificate(
     console.log(`[SC] updateCertificate tx: ${tx.hash}`);
   } catch (err) {
     console.error("[SC] updateCertificate failed:", err);
+    throw err;
   }
 }
 
@@ -201,6 +240,7 @@ export async function scSubmitRevocationRequest(
     console.log(`[SC] submitRevocationRequest tx: ${tx.hash}`);
   } catch (err) {
     console.error("[SC] submitRevocationRequest failed:", err);
+    throw err;
   }
 }
 
@@ -225,6 +265,7 @@ export async function scApproveRevocation(
     console.log(`[SC] revokeCertificate tx: ${tx2.hash}`);
   } catch (err) {
     console.error("[SC] approveRevocation failed:", err);
+    throw err;
   }
 }
 
@@ -240,10 +281,27 @@ export async function scRejectRevocation(revocationId: string): Promise<void> {
     console.log(`[SC] rejectRevocation tx: ${tx.hash}`);
   } catch (err) {
     console.error("[SC] rejectRevocation failed:", err);
+    throw err;
   }
 }
 
 // ===================== Read-Only Queries =====================
+
+/**
+ * Called when admin directly revokes a certificate (without a request).
+ */
+export async function scRevokeCertificate(serialNumber: string, reason: string): Promise<void> {
+  try {
+    const wallet = await getAdminWallet();
+    const contract = getContract(wallet);
+    const tx = await contract.revokeCertificate(serialNumber, reason);
+    await tx.wait();
+    console.log(`[SC] revokeCertificate tx: ${tx.hash}`);
+  } catch (err) {
+    console.error("[SC] revokeCertificate failed:", err);
+    throw err;
+  }
+}
 
 /**
  * Verifies that the certPem in the local DB has not been tampered with

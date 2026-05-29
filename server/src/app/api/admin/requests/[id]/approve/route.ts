@@ -64,8 +64,8 @@ export async function POST(
       }),
     ]);
 
-    // Anchor approval + certificate issuance on-chain (fire-and-forget)
-    scApproveRequestAndIssueCert(
+    // Anchor approval + certificate issuance on-chain (awaits completion)
+    await scApproveRequestAndIssueCert(
       id,
       newCert.id,
       result.serialNumber,

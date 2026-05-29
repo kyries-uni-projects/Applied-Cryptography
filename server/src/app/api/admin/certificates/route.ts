@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logAction } from "@/lib/audit";
+import { scRevokeCertificate } from "@/lib/sc-client";
 
 export async function GET() {
   try {
@@ -41,6 +42,8 @@ export async function DELETE(request: NextRequest) {
       where: { id: certificateId },
       data: { status: "REVOKED", revokedAt: new Date() },
     });
+
+    await scRevokeCertificate(cert.serialNumber, reason || "Admin thu hồi");
 
     await logAction(userId, username, "REVOKE_CERT", `Thu hồi chứng chỉ SN:${cert.serialNumber.slice(0, 16)}... (user: ${cert.user.username}). Lý do: ${reason || "Admin thu hồi"}`);
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { signCertificate, generateSerialNumber } from "@/lib/crypto";
 import { logAction } from "@/lib/audit";
-import { scUpdateCertificate } from "@/lib/sc-client";
+import { scIssueCertificate, scRevokeCertificate } from "@/lib/sc-client";
 import { MASTER_KEY } from "@/lib/env";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -90,8 +90,20 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 			});
 		});
 
-		// Update the on-chain certificate record with the renewed PEM hash and validity (fire-and-forget)
-		scUpdateCertificate(newCert.id, result.certPem, result.notBefore, result.notAfter);
+		// Anchor revocation of old cert on-chain
+		await scRevokeCertificate(cert.serialNumber, "Superseded (Renewed)");
+
+		// Issue the new certificate on-chain
+		await scIssueCertificate(
+			newCert.id,
+			newCert.serialNumber,
+			newCert.userId,
+			result.certPem,
+			result.subjectDN,
+			result.issuerDN,
+			result.notBefore,
+			result.notAfter
+		);
 
 		await logAction(
 			userId,
