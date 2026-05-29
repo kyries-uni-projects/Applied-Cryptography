@@ -81,7 +81,7 @@ cast send <YOUR_DEPLOYED_CONTRACT_ADDRESS> "addAdmin(address)" <CA_ROOT_WALLET_A
 Start the Next.js development server:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 - Access the app at: `http://localhost:3000`
