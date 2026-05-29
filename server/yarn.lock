@@ -2,7 +2,11 @@
 # Manual changes might be lost - proceed with caution!
 
 __metadata:
+<<<<<<< HEAD
   version: 9
+=======
+  version: 10
+>>>>>>> d93a9c2aa7713a790df7e44da01af09934860542
   cacheKey: 10
 
 "@adobe/css-tools@npm:^4.4.0":
