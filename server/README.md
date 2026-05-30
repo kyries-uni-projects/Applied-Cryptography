@@ -56,11 +56,14 @@ The smart contract must be deployed to the Avalanche Fuji Testnet.
 ```bash
 cd smart-contracts
 
+# Install dependencies
+git submodule update --init --recursive
+
 # Compile the contract
 forge build
 
-# Deploy (replace $PRIVATE_KEY with your deployer wallet private key)
-forge script script/DeployCertificateRegistry.s.sol --rpc-url https://api.avax-test.network/ext/bc/C/rpc --broadcast --private-key $PRIVATE_KEY
+# Deploy (replace $DEPLOYER_PRIVATE_KEY with your deployer wallet private key)
+forge script script/DeployCertificateRegistry.s.sol --rpc-url https://api.avax-test.network/ext/bc/C/rpc --broadcast --private-key $DEPLOYER_PRIVATE_KEY
 ```
 
 **Important**: Note the deployed `CertificateRegistry` address from the output and update your `CERTIFICATE_REGISTRY_ADDRESS` in `.env`.
