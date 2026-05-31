@@ -31,6 +31,15 @@ export default function UploadPage() {
 		fetchCerts();
 	}, [fetchCerts]);
 
+	const getStatus = (notBefore: string, notAfter: string) => {
+		const now = new Date();
+		const start = new Date(notBefore);
+		const end = new Date(notAfter);
+		if (now < start) return <span className="badge badge-warning badge-sm">Chưa hiệu lực</span>;
+		if (now > end) return <span className="badge badge-error badge-sm">Hết hạn</span>;
+		return <span className="badge badge-success badge-sm">Hợp lệ</span>;
+	};
+
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
@@ -131,6 +140,7 @@ export default function UploadPage() {
 								<th>Subject</th>
 								<th>Issuer</th>
 								<th>Hiệu lực</th>
+								<th>Trạng thái</th>
 								<th>Hành động</th>
 							</tr>
 						</thead>
@@ -143,6 +153,7 @@ export default function UploadPage() {
 									<td className="text-xs whitespace-nowrap">
 										{new Date(c.notBefore).toLocaleDateString("vi-VN")} → {new Date(c.notAfter).toLocaleDateString("vi-VN")}
 									</td>
+									<td>{getStatus(c.notBefore, c.notAfter)}</td>
 									<td>
 										<button className="btn btn-ghost btn-xs" onClick={() => setViewCert(c)}>
 											Xem
@@ -152,7 +163,7 @@ export default function UploadPage() {
 							))}
 							{certs.length === 0 && (
 								<tr>
-									<td colSpan={5} className="text-center py-8 text-base-content/50">
+									<td colSpan={6} className="text-center py-8 text-base-content/50">
 										Chưa upload chứng chỉ nào
 									</td>
 								</tr>
@@ -182,6 +193,10 @@ export default function UploadPage() {
 							<div>
 								<p className="text-xs text-base-content/50">Hiệu lực đến</p>
 								<p>{new Date(viewCert.notAfter).toLocaleString("vi-VN")}</p>
+							</div>
+							<div>
+								<p className="text-xs text-base-content/50">Trạng thái</p>
+								<p>{getStatus(viewCert.notBefore, viewCert.notAfter)}</p>
 							</div>
 						</div>
 						<div className="divider">PEM</div>
